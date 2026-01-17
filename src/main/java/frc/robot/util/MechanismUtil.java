@@ -3,11 +3,14 @@ package frc.robot.util;
 import com.ctre.phoenix6.controls.NeutralOut;
 import com.ctre.phoenix6.controls.VoltageOut;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.MutAngle;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import frc.robot.util.LoggedDIO.LoggedDIO;
 import frc.robot.util.LoggedTalon.LoggedTalonFX;
+import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
 
 public class MechanismUtil {
 
@@ -36,11 +39,11 @@ public class MechanismUtil {
       LoggedTalonFX talonFX,
       LoggedDIO limitSwitch,
       Subsystem subsystem,
-      double initialVoltage, // TODO: These should be LoggedTunableNumbers/Measures
+      DoubleSupplier initialVoltage,
       boolean forward,
-      Angle switchPosition,
-      double confirmVoltage,
-      Angle confirmPosition) {
+      Supplier<MutAngle> switchPosition,
+      DoubleSupplier confirmVoltage,
+      Supplier<MutAngle> confirmPosition) {
     VoltageOut out = new VoltageOut(0);
     NeutralOut neutral = new NeutralOut();
     Runnable towardPeriodic =
@@ -50,16 +53,16 @@ public class MechanismUtil {
     Command command =
         new FunctionalCommand(
             () -> {
-              out.withOutput(initialVoltage * (forward ? 1 : -1));
+              out.withOutput(initialVoltage.getAsDouble() * (forward ? 1 : -1));
               towardPeriodic.run();
             },
             towardPeriodic,
             // Only set the position if we are done homing and confirm is not wanted
-            confirmVoltage == 0
+            confirmVoltage.getAsDouble() == 0
                 ? (interrupted) -> {
                   talonFX.setControl(neutral);
                   if (!interrupted) {
-                    talonFX.setPosition(switchPosition);
+                    talonFX.setPosition(switchPosition.get());
                   }
                 }
                 : (interrupted) -> {
@@ -67,7 +70,7 @@ public class MechanismUtil {
                 },
             limitSwitch,
             subsystem);
-    if (confirmVoltage != 0) {
+    if (confirmVoltage.getAsDouble() != 0) {
       Runnable awayPeriodic =
           forward
               ? () -> talonFX.setControl(out.withLimitReverseMotion(limitSwitch.get()))
@@ -77,26 +80,26 @@ public class MechanismUtil {
               // Now away from stop
               new FunctionalCommand(
                   () -> {
-                    out.withOutput(confirmVoltage * (forward ? -1 : 1));
+                    out.withOutput(confirmVoltage.getAsDouble() * (forward ? -1 : 1));
                     awayPeriodic.run();
                   },
                   awayPeriodic,
                   (interrupted) -> talonFX.setControl(neutral),
                   forward
-                      ? () -> talonFX.getPosition().lte(confirmPosition)
-                      : () -> talonFX.getPosition().gte(confirmPosition),
+                      ? () -> talonFX.getPosition().lte(confirmPosition.get())
+                      : () -> talonFX.getPosition().gte(confirmPosition.get()),
                   subsystem),
               // Now back to the stop
               new FunctionalCommand(
                   () -> {
-                    out.withOutput(confirmVoltage * (forward ? 1 : -1));
+                    out.withOutput(confirmVoltage.getAsDouble() * (forward ? 1 : -1));
                     towardPeriodic.run();
                   },
                   towardPeriodic,
                   (interrupted) -> {
                     talonFX.setControl(neutral);
                     if (!interrupted) {
-                      talonFX.setPosition(switchPosition);
+                      talonFX.setPosition(switchPosition.get());
                     }
                   },
                   limitSwitch,
