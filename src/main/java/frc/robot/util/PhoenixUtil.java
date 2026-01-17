@@ -10,14 +10,14 @@ package frc.robot.util;
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.StatusCode;
-import com.ctre.phoenix6.StatusSignal;
 import frc.robot.Robot;
 import java.util.function.Supplier;
 
 public class PhoenixUtil {
 
   public static final double kOptimizedSignalFrequency = 0;
-  public static final double kRioSignalUpdateFrequency = 1/Robot.defaultPeriodSecs;
+  public static final double kRioSignalUpdateFrequency = 1 / Robot.defaultPeriodSecs;
+
   /** Attempts to run the command until no error is produced. */
   public static void tryUntilOk(int maxAttempts, Supplier<StatusCode> command) {
     for (int i = 0; i < maxAttempts; i++) {
@@ -25,6 +25,7 @@ public class PhoenixUtil {
       if (error.isOK()) break;
     }
   }
+
   // Copyright (c) 2025 FRC 6328
   // http://github.com/Mechanical-Advantage
   //
@@ -50,8 +51,9 @@ public class PhoenixUtil {
       rioSignals = newSignals;
     }
   }
+
   public static void registerSignals(CANBus canBus, BaseStatusSignal... signals) {
-    registerSignals(canBus.isNetworkFD(),signals);
+    registerSignals(canBus.isNetworkFD(), signals);
   }
 
   /** Refresh all registered signals. */
@@ -65,5 +67,4 @@ public class PhoenixUtil {
   }
 
   private static final double CONNECTED_LATENCY_S = 0.500; // Phoenix default
-
 }

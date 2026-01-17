@@ -51,20 +51,21 @@ public class PhoenixTalonFX extends LoggedTalonFX {
       torqueCurrentSignal[i] = talonFX[i].getTorqueCurrent();
       supplyCurrentSignal[i] = talonFX[i].getSupplyCurrent();
       temperatureSignal[i] = talonFX[i].getDeviceTemp();
-      BaseStatusSignal.setUpdateFrequencyForAll(PhoenixUtil.kRioSignalUpdateFrequency,voltageSignal[i], torqueCurrentSignal[i], supplyCurrentSignal[i], temperatureSignal[i]);
+      BaseStatusSignal.setUpdateFrequencyForAll(
+          PhoenixUtil.kRioSignalUpdateFrequency,
+          voltageSignal[i],
+          torqueCurrentSignal[i],
+          supplyCurrentSignal[i],
+          temperatureSignal[i]);
       talonFX[i].optimizeBusUtilization(PhoenixUtil.kOptimizedSignalFrequency);
-
-
     }
     velocitySignal = talonFX[0].getVelocity();
     positionSignal = talonFX[0].getPosition();
 
-    PhoenixUtil.registerSignals(canBus,voltageSignal);
-    PhoenixUtil.registerSignals(canBus,torqueCurrentSignal);
-    PhoenixUtil.registerSignals(canBus,supplyCurrentSignal);
-    PhoenixUtil.registerSignals(canBus,velocitySignal,positionSignal);
-
-
+    PhoenixUtil.registerSignals(canBus, voltageSignal);
+    PhoenixUtil.registerSignals(canBus, torqueCurrentSignal);
+    PhoenixUtil.registerSignals(canBus, supplyCurrentSignal);
+    PhoenixUtil.registerSignals(canBus, velocitySignal, positionSignal);
   }
 
   @Override
@@ -75,10 +76,14 @@ public class PhoenixTalonFX extends LoggedTalonFX {
   @Override
   protected void updateInputs(TalonFXInputs inputs) {
     for (int i = 0; i <= super.followers; i++) {
-      inputs.connected[i] = connectionDebouncer[i].calculate(
-          BaseStatusSignal.isAllGood(voltageSignal[i],torqueCurrentSignal[i],supplyCurrentSignal[i],temperatureSignal[i])
-          && (i != 0 || BaseStatusSignal.isAllGood(positionSignal, velocitySignal))
-      );
+      inputs.connected[i] =
+          connectionDebouncer[i].calculate(
+              BaseStatusSignal.isAllGood(
+                      voltageSignal[i],
+                      torqueCurrentSignal[i],
+                      supplyCurrentSignal[i],
+                      temperatureSignal[i])
+                  && (i != 0 || BaseStatusSignal.isAllGood(positionSignal, velocitySignal)));
       inputs.appliedVolts[i] = voltageSignal[i].getValueAsDouble();
       inputs.torqueCurrentAmps[i] = torqueCurrentSignal[i].getValueAsDouble();
       inputs.supplyCurrentAmps[i] = supplyCurrentSignal[i].getValueAsDouble();

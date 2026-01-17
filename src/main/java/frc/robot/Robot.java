@@ -7,12 +7,7 @@
 
 package frc.robot;
 
-import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.SignalLogger;
-import edu.wpi.first.wpilibj.Alert;
-import edu.wpi.first.wpilibj.Alert.AlertType;
-import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.util.PhoenixUtil;
@@ -79,7 +74,6 @@ public class Robot extends LoggedRobot {
     // Instantiate our RobotContainer. This will perform all our button bindings,
     // and put our autonomous chooser on the dashboard.
     robotContainer = new RobotContainer();
-
   }
 
   /** This function is called periodically during all modes. */
