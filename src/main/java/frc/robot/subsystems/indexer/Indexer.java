@@ -26,18 +26,18 @@ public class Indexer {
   public Indexer() {
     switch (Constants.currentMode) {
       case REAL -> {
-        kicker = new Kicker(new PhoenixTalonFX(12, bus, "Kicker"));
+        kicker = new Kicker(new PhoenixTalonFX(20, bus, "Kicker"));
         rollers =
-            new Rollers(new PhoenixTalonFX(12, bus, "Rollers"), new HardwareDIO("RollerBeam", 0));
-        spindexer = new Spindexer(new PhoenixTalonFX(13, bus, "Spindexer"));
+            new Rollers(new PhoenixTalonFX(21, bus, "Rollers"), new HardwareDIO("RollerBeam", 0));
+        spindexer = new Spindexer(new PhoenixTalonFX(22, bus, "Spindexer"));
       }
       case SIM -> {
-        kicker = new Kicker(new SimpleMotorSim(12, bus, "Kicker", 0, 1));
+        kicker = new Kicker(new SimpleMotorSim(20, bus, "Kicker", 0, 1));
         rollers =
             new Rollers(
-                new SimpleMotorSim(12, bus, "Rollers", 0, 1),
+                new SimpleMotorSim(21, bus, "Rollers", 0, 1),
                 new SimDIO("RollerBeam", SimDIO.fromNT("RollerBeam")));
-        spindexer = new Spindexer(new SimpleMotorSim(13, bus, "Spindexer", 0, 1));
+        spindexer = new Spindexer(new SimpleMotorSim(22, bus, "Spindexer", 0, 1));
       }
       default -> {
         kicker = new Kicker(new NoOppTalonFX("Kicker", 0));
