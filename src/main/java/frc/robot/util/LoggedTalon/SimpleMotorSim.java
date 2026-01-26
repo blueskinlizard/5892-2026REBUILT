@@ -13,14 +13,14 @@ public class SimpleMotorSim extends BaseTalonFXSim {
       int canID,
       CANBus canBus,
       String name,
-      double JKgMetersSquared,
+      double J_KgMetersSquared,
       double gearReduction,
       PhoenixTalonFollower... followers) {
     super(canID, canBus, name, followers);
     motorSim =
         new DCMotorSim(
             LinearSystemId.createDCMotorSystem(
-                DCMotor.getKrakenX60Foc(followers.length + 1), JKgMetersSquared, gearReduction),
+                DCMotor.getKrakenX60Foc(followers.length + 1), J_KgMetersSquared, gearReduction),
             DCMotor.getKrakenX60Foc(followers.length + 1));
   }
 
