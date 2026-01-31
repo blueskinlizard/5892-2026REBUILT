@@ -23,8 +23,7 @@ import org.littletonrobotics.junction.Logger;
 
 /** Thank you so much 6328! */
 public class ShotCalculator {
-  private static final Transform2d robotToTurret = new Transform2d();
-
+  public static final Transform2d robotToTurret = new Transform2d();
   //   private static final LinearFilter turretAngleFilter =
   //       LinearFilter.movingAverage((int) (0.1 / Robot.defaultPeriodSecs));
   //   private static final LinearFilter hoodAngleFilter =
