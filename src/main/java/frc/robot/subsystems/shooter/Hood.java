@@ -11,17 +11,42 @@ import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import edu.wpi.first.math.geometry.Rectangle2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.units.measure.MutAngle;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.util.FieldConstants.LinesHorizontal;
+import frc.robot.util.FieldConstants.LinesVertical;
 import frc.robot.util.GenericPositionMechanismSubsystem;
 import frc.robot.util.LoggedDIO.LoggedDIO;
 import frc.robot.util.LoggedTalon.LoggedTalonFX;
 import frc.robot.util.LoggedTunableMeasure;
 import frc.robot.util.LoggedTunableNumber;
+import org.littletonrobotics.junction.AutoLogOutput;
 
 public class Hood extends GenericPositionMechanismSubsystem {
   private final LoggedTunableMeasure<MutAngle> stowPosition =
       new LoggedTunableMeasure<>("Hood/StowAngle", Degrees.mutable(0));
+
+  @AutoLogOutput(key = "Hood/trenchAreas")
+  public static final Rectangle2d[] trenchAreas = {
+    new Rectangle2d(
+        new Translation2d(LinesVertical.starting, LinesHorizontal.leftTrenchOpenStart),
+        new Translation2d(LinesVertical.neutralZoneNear, LinesHorizontal.leftTrenchOpenEnd)),
+    new Rectangle2d(
+        new Translation2d(
+            (2 * LinesVertical.center) - LinesVertical.starting,
+            LinesHorizontal.leftTrenchOpenStart),
+        new Translation2d(LinesVertical.neutralZoneFar, LinesHorizontal.leftTrenchOpenEnd)),
+    new Rectangle2d(
+        new Translation2d(LinesVertical.starting, LinesHorizontal.rightTrenchOpenStart),
+        new Translation2d(LinesVertical.neutralZoneNear, LinesHorizontal.rightTrenchOpenEnd)),
+    new Rectangle2d(
+        new Translation2d(
+            (2 * LinesVertical.center) - LinesVertical.starting,
+            LinesHorizontal.rightTrenchOpenStart),
+        new Translation2d(LinesVertical.neutralZoneFar, LinesHorizontal.rightTrenchOpenEnd))
+  };
 
   public Hood(LoggedTalonFX motor, LoggedDIO reverseLimit, LoggedDIO forwardLimit) {
     super(
