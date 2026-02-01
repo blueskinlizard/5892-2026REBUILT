@@ -11,11 +11,7 @@ import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.hardware.TalonFXS;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import edu.wpi.first.math.filter.Debouncer;
-import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.AngularVelocity;
-import edu.wpi.first.units.measure.Current;
-import edu.wpi.first.units.measure.Temperature;
-import edu.wpi.first.units.measure.Voltage;
+import edu.wpi.first.units.measure.*;
 import frc.robot.util.LoggedTalon.Follower.PhoenixTalonFollower;
 import frc.robot.util.PhoenixUtil;
 import java.util.function.Function;
@@ -31,6 +27,17 @@ public class PhoenixTalonFXS extends LoggedTalonFXS {
   private final StatusSignal<AngularVelocity> velocitySignal;
   private final StatusSignal<Angle> positionSignal;
 
+  /**
+   * Create a TalonFXS that actually interacts with hardware (or CRTE's high fidelity simulation)
+   *
+   * @param canID The motor's CAN ID
+   * @param canBus The motor's CAN Bus
+   * @param name The Motors Name. This <strong>MUST NOT</strong> be changed in replay.
+   * @param followers Followers, if any. Followers will share the same output as the leader. All
+   *     followers are designed to be physically connected to the leader and as such their velocity
+   *     and position are not accessible separately. The current number off followers
+   *     <strong>MUST</strong> be passed into simulation and replay.
+   */
   @SuppressWarnings({"unchecked", "resource"})
   public PhoenixTalonFXS(int canID, CANBus canBus, String name, PhoenixTalonFollower... followers) {
 
@@ -74,6 +81,7 @@ public class PhoenixTalonFXS extends LoggedTalonFXS {
     PhoenixUtil.registerSignals(canBus, velocitySignal, positionSignal);
   }
 
+  /** {@inheritDoc} */
   @Override
   public void setControl(ControlRequest controlRequest) {
     talonFX[0].setControl(controlRequest);
@@ -99,33 +107,39 @@ public class PhoenixTalonFXS extends LoggedTalonFXS {
     inputs.velocityRotPS = velocitySignal.getValueAsDouble();
   }
 
+  /** {@inheritDoc} */
   @Override
   public LoggedTalonFXS withConfig(TalonFXSConfiguration config) {
     PhoenixUtil.tryUntilOk(5, () -> talonFX[0].getConfigurator().apply(config));
     return this;
   }
 
+  /** {@inheritDoc} */
   @Override
   public LoggedTalonFXS withSimConfig(
       Function<TalonFXSConfiguration, TalonFXSConfiguration> config) {
     return this;
   }
 
+  /** {@inheritDoc} */
   @Override
   public void quickApplyConfig(TalonFXSConfiguration config) {
     PhoenixUtil.tryUntilOk(3, () -> talonFX[0].getConfigurator().apply(config));
   }
 
+  /** {@inheritDoc} */
   @Override
   public void quickApplyConfig(SlotConfigs config) {
     PhoenixUtil.tryUntilOk(3, () -> talonFX[0].getConfigurator().apply(config));
   }
 
+  /** {@inheritDoc} */
   @Override
   public void quickApplyConfig(MotionMagicConfigs config) {
     PhoenixUtil.tryUntilOk(3, () -> talonFX[0].getConfigurator().apply(config));
   }
 
+  /** {@inheritDoc} */
   @Override
   public void setPosition(Angle position) {
     talonFX[0].setPosition(position);

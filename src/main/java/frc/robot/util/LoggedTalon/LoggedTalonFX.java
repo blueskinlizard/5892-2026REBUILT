@@ -1,12 +1,105 @@
 package frc.robot.util.LoggedTalon;
 
+import com.ctre.phoenix6.configs.MotionMagicConfigs;
+import com.ctre.phoenix6.configs.SlotConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.wpilibj.Alert;
+import frc.robot.util.LoggedTalon.Follower.PhoenixTalonFollower;
 import java.util.function.Function;
 
+/**
+ *
+ *
+ * <h2>TalonFX motor controller</h1>
+ *
+ * <p>compliant with AdvantageKit with a few quality of life improvements, designed to keep an api
+ * similar to Non-AKit programming
+ *
+ * <p>contains configuration functions that only apply to a {@link TalonFX}
+ *
+ * <p>Depending on the implementation, this object might interface with hardware, a simulation, or a
+ * log file
+ *
+ * <h1>{@link #periodic()} must be called at the beginning of subsystem periodic functions</h1>
+ *
+ * <h4>QOL improvements</h3>
+ *
+ * <ul>
+ *   <li>Method-chaining api to keep constructors concise. See {@link #withPIDTunable(SlotConfigs,
+ *       LoggedTalon...)}
+ *   <li>Connection alerts to the driver dashboard through wpilib {@link Alert}
+ *   <li>Automatic logging of needed data: connection state, applied voltage, torque current, supply
+ *       current, temperature, velocity (leader only), position (leader only)
+ *   <li>Easy PID and Motion Magic tuning through {@link #withPIDTunable(SlotConfigs,
+ *       LoggedTalon...)} and {@link #withMMPIDTuning(SlotConfigs, MotionMagicConfigs,
+ *       LoggedTalon...)},
+ *   <li>Easy and automatic addition of followers: simply pass {@link PhoenixTalonFollower} into
+ *       constructors, like {@link PhoenixTalonFX#PhoenixTalonFX}
+ *   <li>Setpoint checking and other math: {@link #atSetpoint(Angle, Angle)}
+ * </ul>
+ *
+ * <h4>Usage</h4>
+ *
+ * <pre>{@code
+ * // RobotContainer
+ * private final Subsystem1 subsystem1;
+ * private final CANBus canBus = new CANBus("rio");
+ * public RobotContainer() {
+ *   switch (Constants.currentMode) {
+ *     case REAL -> { // Real robot
+ *       // Names much match and be unique
+ *       subsystem1 = new Subsystem1(new PhoenixTalonFX(20, canBus, "Subsystem1Motor"));
+ *     }
+ *     case SIM -> { // Simulate using Phoenix's high fidelity simulation.
+ *     // Other options, like FlywheelSim, are availible
+ *       subsystem1 = new Subsystem1(new SimpleMotorSim(21, canBus, Subsystem1Motor", 0.5, 1));
+ *     }
+ *     default -> { // Replay: do nothing
+ *       subsystem1 = new Subsystem1(new NoOppTalonFX("Subsystem1Motor", 0));
+ *     }
+ *   }
+ * }
+ * // Subsystem1
+ * private final LoggedTalonFX motor;
+ * public Subsystem1(LoggedTalonFX motor) {
+ *   // Look how easy that is!
+ *   this.motor = motor
+ *    .withConfig(
+ *      LoggedTalonFX.buildStandardConfig(40, 40) // This rest is not needed if this motor does not need pid control
+ *      .withSlot0(
+ *        new Slot0Configs()
+ *        .withKP(0).withKI(0).withKD(0)
+ *        .withKS(0).withKV(0)
+ *      )
+ *     )
+ *    .withPIDTunable(SlotConfigs.from(config.Slot0));
+ * }
+ * @Override
+ * public final void periodic() {
+ *  motor.periodic();
+ * }
+ * // Now use it like any other TalonFX
+ * private final PositionVoltage positionControl = new PositionVoltage(0);
+ * public Command move(Angle position) {
+ *   return runOnce(()->motor.setControl(positionControl.withPosition(position)));
+ * }
+ * }</pre>
+ *
+ * @see PhoenixTalonFX
+ * @see SimpleMotorSim
+ * @see TalonFlywheelSim
+ * @see LoggedTalon
+ * @see LoggedTalonFXS
+ */
 public abstract class LoggedTalonFX extends LoggedTalon {
 
+  /**
+   * @see LoggedTalon#LoggedTalon
+   */
   public LoggedTalonFX(String name, int followers) {
     super(name, followers);
   }
@@ -37,9 +130,9 @@ public abstract class LoggedTalonFX extends LoggedTalon {
   /**
    * Build a standard config with a few commonly adjusted values The NeutralMode is Coast
    *
-   * @param statorCurrentLimit Stator current limit in amps This limit directly affects max torque
-   * @param supplyCurrentLimit Supply current limit in amps This limit affects brownouts and battery
-   *     usage
+   * @param statorCurrentLimit Stator current limit in amps. This limit directly affects max torque
+   * @param supplyCurrentLimit Supply current limit in amps. This limit affects brownouts and
+   *     battery usage
    * @param invert Motor direction. Default: CCW positive
    * @return the built config
    */
@@ -52,9 +145,9 @@ public abstract class LoggedTalonFX extends LoggedTalon {
   /**
    * Build a standard config with a few commonly adjusted values The InvertValue is CCW positive
    *
-   * @param statorCurrentLimit Stator current limit in amps This limit directly affects max torque
-   * @param supplyCurrentLimit Supply current limit in amps This limit affects brownouts and battery
-   *     usage
+   * @param statorCurrentLimit Stator current limit in amps. This limit directly affects max torque
+   * @param supplyCurrentLimit Supply current limit in amps. This limit affects brownouts and
+   *     battery usage
    * @param neutralMode Neutral mode. Default: Coast
    * @return the built config
    */
@@ -67,6 +160,14 @@ public abstract class LoggedTalonFX extends LoggedTalon {
         neutralMode);
   }
 
+  /**
+   * Build a standard config with a few commonly adjusted values The InvertValue is CCW positive
+   *
+   * @param statorCurrentLimit Stator current limit in amps. This limit directly affects max torque
+   * @param supplyCurrentLimit Supply current limit in amps. This limit affects brownouts and
+   *     battery usage
+   * @return the built config
+   */
   public static TalonFXConfiguration buildStandardConfig(
       double statorCurrentLimit, double supplyCurrentLimit) {
     return LoggedTalonFX.buildStandardConfig(
@@ -96,5 +197,13 @@ public abstract class LoggedTalonFX extends LoggedTalon {
   public abstract LoggedTalonFX withSimConfig(
       Function<TalonFXConfiguration, TalonFXConfiguration> config);
 
+  /**
+   * Apply a config more quickly, up to 3 times.
+   *
+   * <p>This is designed for extra tuning logic not covered in {@link #withPIDTunable(SlotConfigs,
+   * LoggedTalon...)} or{@link #withMMPIDTuning(SlotConfigs, MotionMagicConfigs, LoggedTalon...)}
+   *
+   * @param config The config to apply
+   */
   public abstract void quickApplyConfig(TalonFXConfiguration config);
 }
