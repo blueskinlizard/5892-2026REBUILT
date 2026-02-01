@@ -1,23 +1,24 @@
-package frc.robot.util.LoggedTalon;
+package frc.robot.util.LoggedTalon.TalonFXS;
 
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.SlotConfigs;
-import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.configs.TalonFXSConfiguration;
 import com.ctre.phoenix6.controls.ControlRequest;
 import com.ctre.phoenix6.controls.Follower;
-import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.hardware.TalonFXS;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.units.measure.*;
 import frc.robot.util.LoggedTalon.Follower.PhoenixTalonFollower;
+import frc.robot.util.LoggedTalon.TalonInputs;
 import frc.robot.util.PhoenixUtil;
 import java.util.function.Function;
 
-public class PhoenixTalonFX extends LoggedTalonFX {
-  protected final TalonFX[] talonFX;
+public class PhoenixTalonFXS extends LoggedTalonFXS {
+  protected final TalonFXS[] talonFX;
   private final Debouncer[] connectionDebouncer;
 
   private final StatusSignal<Voltage>[] voltageSignal;
@@ -28,7 +29,7 @@ public class PhoenixTalonFX extends LoggedTalonFX {
   private final StatusSignal<Angle> positionSignal;
 
   /**
-   * Create a TalonFX that actually interacts with hardware (or CRTE's high fidelity simulation)
+   * Create a TalonFXS that actually interacts with hardware (or CRTE's high fidelity simulation)
    *
    * @param canID The motor's CAN ID
    * @param canBus The motor's CAN Bus
@@ -39,11 +40,11 @@ public class PhoenixTalonFX extends LoggedTalonFX {
    *     <strong>MUST</strong> be passed into simulation and replay.
    */
   @SuppressWarnings({"unchecked", "resource"})
-  public PhoenixTalonFX(int canID, CANBus canBus, String name, PhoenixTalonFollower... followers) {
+  public PhoenixTalonFXS(int canID, CANBus canBus, String name, PhoenixTalonFollower... followers) {
 
     super(name, followers.length);
 
-    talonFX = new TalonFX[followers.length + 1];
+    talonFX = new TalonFXS[followers.length + 1];
     connectionDebouncer = new Debouncer[followers.length + 1];
     // The trust me bro guarantee
     voltageSignal = (StatusSignal<Voltage>[]) new StatusSignal[followers.length + 1];
@@ -54,9 +55,9 @@ public class PhoenixTalonFX extends LoggedTalonFX {
     Follower follower = new Follower(canID, MotorAlignmentValue.Aligned);
     for (int i = 0; i <= followers.length; i++) {
       if (i == 0) {
-        talonFX[0] = new TalonFX(canID, canBus);
+        talonFX[0] = new TalonFXS(canID, canBus);
       } else {
-        talonFX[i] = new TalonFX(followers[i - 1].canid(), canBus);
+        talonFX[i] = new TalonFXS(followers[i - 1].canid(), canBus);
         talonFX[i].setControl(follower.withMotorAlignment(followers[i - 1].opposeDirection()));
       }
       connectionDebouncer[i] = new Debouncer(0.5);
@@ -109,20 +110,21 @@ public class PhoenixTalonFX extends LoggedTalonFX {
 
   /** {@inheritDoc} */
   @Override
-  public LoggedTalonFX withConfig(TalonFXConfiguration config) {
+  public LoggedTalonFXS withConfig(TalonFXSConfiguration config) {
     PhoenixUtil.tryUntilOk(5, () -> talonFX[0].getConfigurator().apply(config));
     return this;
   }
 
   /** {@inheritDoc} */
   @Override
-  public LoggedTalonFX withSimConfig(Function<TalonFXConfiguration, TalonFXConfiguration> config) {
+  public LoggedTalonFXS withSimConfig(
+      Function<TalonFXSConfiguration, TalonFXSConfiguration> config) {
     return this;
   }
 
   /** {@inheritDoc} */
   @Override
-  public void quickApplyConfig(TalonFXConfiguration config) {
+  public void quickApplyConfig(TalonFXSConfiguration config) {
     PhoenixUtil.tryUntilOk(3, () -> talonFX[0].getConfigurator().apply(config));
   }
 

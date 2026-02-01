@@ -1,4 +1,4 @@
-package frc.robot.util.LoggedTalon;
+package frc.robot.util.LoggedTalon.TalonFX;
 
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.SlotConfigs;
@@ -9,6 +9,8 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.Alert;
 import frc.robot.util.LoggedTalon.Follower.PhoenixTalonFollower;
+import frc.robot.util.LoggedTalon.LoggedTalon;
+import frc.robot.util.LoggedTalon.TalonFXS.LoggedTalonFXS;
 import java.util.function.Function;
 
 /**
@@ -56,7 +58,7 @@ import java.util.function.Function;
  *     }
  *     case SIM -> { // Simulate using Phoenix's high fidelity simulation.
  *     // Other options, like FlywheelSim, are availible
- *       subsystem1 = new Subsystem1(new SimpleMotorSim(21, canBus, Subsystem1Motor", 0.5, 1));
+ *       subsystem1 = new Subsystem1(new TalonFXSimpleMotorSim(21, canBus, Subsystem1Motor", 0.5, 1));
  *     }
  *     default -> { // Replay: do nothing
  *       subsystem1 = new Subsystem1(new NoOppTalonFX("Subsystem1Motor", 0));
@@ -90,8 +92,8 @@ import java.util.function.Function;
  * }</pre>
  *
  * @see PhoenixTalonFX
- * @see SimpleMotorSim
- * @see TalonFlywheelSim
+ * @see TalonFXSimpleMotorSim
+ * @see TalonFXFlywheelSim
  * @see LoggedTalon
  * @see LoggedTalonFXS
  */

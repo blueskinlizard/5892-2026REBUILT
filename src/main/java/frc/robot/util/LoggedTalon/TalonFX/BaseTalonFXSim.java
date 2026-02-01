@@ -1,10 +1,11 @@
-package frc.robot.util.LoggedTalon;
+package frc.robot.util.LoggedTalon.TalonFX;
 
 import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.sim.TalonFXSimState;
 import edu.wpi.first.wpilibj.RobotController;
 import frc.robot.util.LoggedTalon.Follower.PhoenixTalonFollower;
+import frc.robot.util.LoggedTalon.TalonInputs;
 import java.util.function.Function;
 
 /**

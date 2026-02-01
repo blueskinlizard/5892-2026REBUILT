@@ -13,6 +13,14 @@ import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.Constants;
 import frc.robot.util.LoggedTalon.Follower.PhoenixTalonFollower;
+import frc.robot.util.LoggedTalon.TalonFX.LoggedTalonFX;
+import frc.robot.util.LoggedTalon.TalonFX.NoOppTalonFX;
+import frc.robot.util.LoggedTalon.TalonFX.PhoenixTalonFX;
+import frc.robot.util.LoggedTalon.TalonFX.TalonFXFlywheelSim;
+import frc.robot.util.LoggedTalon.TalonFX.TalonFXSimpleMotorSim;
+import frc.robot.util.LoggedTalon.TalonFXS.LoggedTalonFXS;
+import frc.robot.util.LoggedTalon.TalonFXS.NoOppTalonFXS;
+import frc.robot.util.LoggedTalon.TalonFXS.PhoenixTalonFXS;
 import frc.robot.util.LoggedTunableMeasure;
 import frc.robot.util.LoggedTunableNumber;
 import java.util.function.Consumer;
@@ -65,7 +73,7 @@ import org.littletonrobotics.junction.inputs.LoggableInputs;
  *     }
  *     case SIM -> { // Simulate using Phoenix's high fidelity simulation.
  *     // Other options, like FlywheelSim, are availible
- *       subsystem1 = new Subsystem1(new SimpleMotorSim(21, canBus, Subsystem1Motor", 0.5, 1));
+ *       subsystem1 = new Subsystem1(new TalonFXSimpleMotorSim(21, canBus, Subsystem1Motor", 0.5, 1));
  *     }
  *     default -> { // Replay: do nothing
  *       subsystem1 = new Subsystem1(new NoOppTalonFX("Subsystem1Motor", 0));
@@ -102,8 +110,8 @@ import org.littletonrobotics.junction.inputs.LoggableInputs;
  * @see LoggedTalonFXS
  * @see PhoenixTalonFX
  * @see PhoenixTalonFXS
- * @see SimpleMotorSim
- * @see TalonFlywheelSim
+ * @see TalonFXSimpleMotorSim
+ * @see TalonFXFlywheelSim
  */
 public abstract class LoggedTalon {
   protected final String name;
@@ -132,8 +140,8 @@ public abstract class LoggedTalon {
    * @see NoOppTalonFXS#NoOppTalonFXS
    * @see PhoenixTalonFX#PhoenixTalonFX
    * @see PhoenixTalonFXS#PhoenixTalonFXS
-   * @see SimpleMotorSim#SimpleMotorSim
-   * @see TalonFlywheelSim#TalonFlywheelSim
+   * @see TalonFXSimpleMotorSim#TalonFXSimpleMotorSim
+   * @see TalonFXFlywheelSim#TalonFXFlywheelSim
    * @param name The name of this instance. This <strong>MUST</strong> be unique and <strong>MUST
    *     NOT</strong> be changed in replay.
    * @param followers The number of followers this instance has. This is assumed to be accurate.
@@ -433,7 +441,7 @@ public abstract class LoggedTalon {
    * <p>This function is equivalent to the {@link TalonFX#getPosition()}status signal, so the value
    * will change depending on {@link FeedbackConfigs#SensorToMechanismRatio}
    *
-   * <p>Note: in some simulations (ie {@link TalonFlywheelSim}, this will always return 0
+   * <p>Note: in some simulations (ie {@link TalonFXFlywheelSim}, this will always return 0
    *
    * @return the current position
    */
@@ -447,7 +455,7 @@ public abstract class LoggedTalon {
    * <p>This function is equivalent to the {@link TalonFX#getPosition()}status signal, so the value
    * will change depending on {@link FeedbackConfigs#SensorToMechanismRatio}
    *
-   * <p>Note: in some simulations (ie {@link TalonFlywheelSim}, this will always return 0
+   * <p>Note: in some simulations (ie {@link TalonFXFlywheelSim}, this will always return 0
    *
    * @return the current position
    */
