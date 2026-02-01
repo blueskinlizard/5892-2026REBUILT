@@ -20,6 +20,9 @@ import java.util.function.Function;
  * @see LoggedTalonFXS
  * @see NoOppTalonFX
  */
+// Maintainer notes:
+// The file is currently a copy of LoggedTalonFX, with all instances of TalonFX replaced with
+// TalonFXS. Thanks CTRE, much appreciated
 public class NoOppTalonFXS extends LoggedTalonFXS {
 
   /**

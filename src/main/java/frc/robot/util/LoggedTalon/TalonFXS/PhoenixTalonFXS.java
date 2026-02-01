@@ -16,7 +16,9 @@ import frc.robot.util.LoggedTalon.Follower.PhoenixTalonFollower;
 import frc.robot.util.LoggedTalon.TalonInputs;
 import frc.robot.util.PhoenixUtil;
 import java.util.function.Function;
-
+// Maintainer notes:
+// The file is currently a copy of LoggedTalonFX, with all instances of TalonFX replaced with
+// TalonFXS. Thanks CTRE, much appreciated
 public class PhoenixTalonFXS extends LoggedTalonFXS {
   protected final TalonFXS[] talonFX;
   private final Debouncer[] connectionDebouncer;
