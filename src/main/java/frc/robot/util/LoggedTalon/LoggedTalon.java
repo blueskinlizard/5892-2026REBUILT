@@ -22,7 +22,7 @@ import org.littletonrobotics.junction.Logger;
  * A TalonFX that is logged. Construct {@link PhoenixTalonFX}, {@link BaseTalonFXSim}, or {@link
  * NoOppTalonFX} to use this class.
  */
-public abstract class LoggedTalonFX {
+public abstract class LoggedTalon {
   protected final String name;
   private final TalonInputsAutoLogged inputs = new TalonInputsAutoLogged();
   private final Alert[] connectionAlerts;
@@ -32,13 +32,13 @@ public abstract class LoggedTalonFX {
   private LoggedTunableNumber[] tunableNumbers = null;
   private SlotConfigs tunedConfigs = null;
   private MotionMagicConfigs mmTunedConfigs = null;
-  private LoggedTalonFX[] tuningFollowers = null;
+  private LoggedTalon[] tuningFollowers = null;
   protected final int followers;
 
   private final MutAngularVelocity velocity = RadiansPerSecond.mutable(0);
   private final MutAngle position = Radian.mutable(0);
 
-  public LoggedTalonFX(String name, int followers) {
+  public LoggedTalon(String name, int followers) {
     this.followers = followers;
     this.name = name;
     this.connectionAlerts = new Alert[followers + 1];
@@ -73,7 +73,7 @@ public abstract class LoggedTalonFX {
 
   private void applyAllTuningChanges(double[] values) {
     applyTuningChange(values);
-    for (LoggedTalonFX tuningFollower : tuningFollowers) {
+    for (LoggedTalon tuningFollower : tuningFollowers) {
       tuningFollower.applyTuningChange(values);
     }
   }
@@ -97,7 +97,7 @@ public abstract class LoggedTalonFX {
     }
   }
 
-  public LoggedTalonFX withPIDTunable(SlotConfigs defaultValues, LoggedTalonFX... followers) {
+  public LoggedTalon withPIDTunable(SlotConfigs defaultValues, LoggedTalon... followers) {
     if (!Constants.tuningMode) return this;
     if (pidTuning) {
       DriverStation.reportWarning("Attempted to initiate PID tuning twice", true);
@@ -121,8 +121,8 @@ public abstract class LoggedTalonFX {
     return this;
   }
 
-  public LoggedTalonFX withMMPIDTuning(
-      SlotConfigs slotConfig, MotionMagicConfigs mmConfig, LoggedTalonFX... followers) {
+  public LoggedTalon withMMPIDTuning(
+      SlotConfigs slotConfig, MotionMagicConfigs mmConfig, LoggedTalon... followers) {
     withPIDTunable(slotConfig, followers);
     if (!Constants.tuningMode) return this;
     this.mmTunedConfigs = mmConfig;
@@ -194,7 +194,7 @@ public abstract class LoggedTalonFX {
    */
   public static TalonFXConfiguration buildStandardConfig(
       double statorCurrentLimit, double supplyCurrentLimit, InvertedValue invert) {
-    return LoggedTalonFX.buildStandardConfig(
+    return LoggedTalon.buildStandardConfig(
         statorCurrentLimit, supplyCurrentLimit, invert, NeutralModeValue.Coast);
   }
 
@@ -209,7 +209,7 @@ public abstract class LoggedTalonFX {
    */
   public static TalonFXConfiguration buildStandardConfig(
       double statorCurrentLimit, double supplyCurrentLimit, NeutralModeValue neutralMode) {
-    return LoggedTalonFX.buildStandardConfig(
+    return LoggedTalon.buildStandardConfig(
         statorCurrentLimit,
         supplyCurrentLimit,
         InvertedValue.CounterClockwise_Positive,
@@ -218,7 +218,7 @@ public abstract class LoggedTalonFX {
 
   public static TalonFXConfiguration buildStandardConfig(
       double statorCurrentLimit, double supplyCurrentLimit) {
-    return LoggedTalonFX.buildStandardConfig(
+    return LoggedTalon.buildStandardConfig(
         statorCurrentLimit,
         supplyCurrentLimit,
         InvertedValue.CounterClockwise_Positive,
@@ -235,7 +235,7 @@ public abstract class LoggedTalonFX {
    * @param config the config to apply
    * @return this for daisy-chaining
    */
-  public abstract LoggedTalonFX withConfig(TalonFXConfiguration config);
+  public abstract LoggedTalon withConfig(TalonFXConfiguration config);
 
   /**
    * Apply a config for simulation. This is ignored by a real IO interface. This should be called
@@ -246,7 +246,7 @@ public abstract class LoggedTalonFX {
    *     simulation resemble reality as much as possible.
    * @return This for daisy-chaining
    */
-  public abstract LoggedTalonFX withSimConfig(
+  public abstract LoggedTalon withSimConfig(
       Function<TalonFXConfiguration, TalonFXConfiguration> config);
 
   public abstract void quickApplyConfig(TalonFXConfiguration config);
