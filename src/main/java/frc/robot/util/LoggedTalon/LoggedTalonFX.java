@@ -2,6 +2,8 @@ package frc.robot.util.LoggedTalon;
 
 import static edu.wpi.first.units.Units.*;
 
+import com.ctre.phoenix6.configs.MotionMagicConfigs;
+import com.ctre.phoenix6.configs.SlotConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.ControlRequest;
 import com.ctre.phoenix6.signals.InvertedValue;
@@ -28,7 +30,8 @@ public abstract class LoggedTalonFX {
   private boolean mmTuning = false;
 
   private LoggedTunableNumber[] tunableNumbers = null;
-  private TalonFXConfiguration tunedConfigs = null;
+  private SlotConfigs tunedConfigs = null;
+  private MotionMagicConfigs mmTunedConfigs = null;
   private LoggedTalonFX[] tuningFollowers = null;
   protected final int followers;
 
@@ -69,32 +72,32 @@ public abstract class LoggedTalonFX {
   }
 
   private void applyAllTuningChanges(double[] values) {
-    applyTuningChange(values, pidTuning, mmTuning);
+    applyTuningChange(values);
     for (LoggedTalonFX tuningFollower : tuningFollowers) {
-      tuningFollower.applyTuningChange(values, pidTuning, mmTuning);
+      tuningFollower.applyTuningChange(values);
     }
   }
 
-  private void applyTuningChange(double[] values, boolean pid, boolean mm) {
-    if (pid) {
-      tunedConfigs.Slot0.kP = values[0];
-      tunedConfigs.Slot0.kI = values[1];
-      tunedConfigs.Slot0.kD = values[2];
-      tunedConfigs.Slot0.kG = values[3];
-      tunedConfigs.Slot0.kS = values[4];
-      tunedConfigs.Slot0.kV = values[5];
-      tunedConfigs.Slot0.kA = values[6];
+  private void applyTuningChange(double[] values) {
+    if (tunedConfigs != null) {
+      tunedConfigs.kP = values[0];
+      tunedConfigs.kI = values[1];
+      tunedConfigs.kD = values[2];
+      tunedConfigs.kG = values[3];
+      tunedConfigs.kS = values[4];
+      tunedConfigs.kV = values[5];
+      tunedConfigs.kA = values[6];
+      quickApplyConfig(tunedConfigs);
     }
-    if (mm) {
-      tunedConfigs.MotionMagic.MotionMagicCruiseVelocity = values[7];
-      tunedConfigs.MotionMagic.MotionMagicAcceleration = values[8];
-      tunedConfigs.MotionMagic.MotionMagicJerk = values[9];
+    if (mmTunedConfigs != null) {
+      mmTunedConfigs.MotionMagicCruiseVelocity = values[7];
+      mmTunedConfigs.MotionMagicAcceleration = values[8];
+      mmTunedConfigs.MotionMagicJerk = values[9];
+      quickApplyConfig(mmTunedConfigs);
     }
-    quickApplyConfig(tunedConfigs);
   }
 
-  public LoggedTalonFX withPIDTunable(
-      TalonFXConfiguration defaultValues, LoggedTalonFX... followers) {
+  public LoggedTalonFX withPIDTunable(SlotConfigs defaultValues, LoggedTalonFX... followers) {
     if (!Constants.tuningMode) return this;
     if (pidTuning) {
       DriverStation.reportWarning("Attempted to initiate PID tuning twice", true);
@@ -103,13 +106,13 @@ public abstract class LoggedTalonFX {
 
     this.tunableNumbers =
         new LoggedTunableNumber[] {
-          new LoggedTunableNumber(name + "/kP", defaultValues.Slot0.kP),
-          new LoggedTunableNumber(name + "/kI", defaultValues.Slot0.kI),
-          new LoggedTunableNumber(name + "/kD", defaultValues.Slot0.kD),
-          new LoggedTunableNumber(name + "/kG", defaultValues.Slot0.kG),
-          new LoggedTunableNumber(name + "/kS", defaultValues.Slot0.kS),
-          new LoggedTunableNumber(name + "/kV", defaultValues.Slot0.kV),
-          new LoggedTunableNumber(name + "/kA", defaultValues.Slot0.kA),
+          new LoggedTunableNumber(name + "/kP", defaultValues.kP),
+          new LoggedTunableNumber(name + "/kI", defaultValues.kI),
+          new LoggedTunableNumber(name + "/kD", defaultValues.kD),
+          new LoggedTunableNumber(name + "/kG", defaultValues.kG),
+          new LoggedTunableNumber(name + "/kS", defaultValues.kS),
+          new LoggedTunableNumber(name + "/kV", defaultValues.kV),
+          new LoggedTunableNumber(name + "/kA", defaultValues.kA),
         };
 
     tunedConfigs = defaultValues;
@@ -119,9 +122,10 @@ public abstract class LoggedTalonFX {
   }
 
   public LoggedTalonFX withMMPIDTuning(
-      TalonFXConfiguration defaultValues, LoggedTalonFX... followers) {
-    withPIDTunable(defaultValues, followers);
+      SlotConfigs slotConfig, MotionMagicConfigs mmConfig, LoggedTalonFX... followers) {
+    withPIDTunable(slotConfig, followers);
     if (!Constants.tuningMode) return this;
+    this.mmTunedConfigs = mmConfig;
     if (mmTuning) {
       DriverStation.reportWarning("Attempted to initiate Motion Magic tuning twice", true);
     }
@@ -129,11 +133,9 @@ public abstract class LoggedTalonFX {
 
     final LoggedTunableNumber[] mmTunableNumbers =
         new LoggedTunableNumber[] {
-          new LoggedTunableNumber(
-              name + "/MM Cruise Velocity", defaultValues.MotionMagic.MotionMagicCruiseVelocity),
-          new LoggedTunableNumber(
-              name + "/MM Acceleration", defaultValues.MotionMagic.MotionMagicAcceleration),
-          new LoggedTunableNumber(name + "/MM Jerk", defaultValues.MotionMagic.MotionMagicJerk),
+          new LoggedTunableNumber(name + "/MM Cruise Velocity", mmConfig.MotionMagicCruiseVelocity),
+          new LoggedTunableNumber(name + "/MM Acceleration", mmConfig.MotionMagicAcceleration),
+          new LoggedTunableNumber(name + "/MM Jerk", mmConfig.MotionMagicJerk),
         };
     final LoggedTunableNumber[] copy =
         new LoggedTunableNumber[this.tunableNumbers.length + mmTunableNumbers.length];
@@ -249,6 +251,10 @@ public abstract class LoggedTalonFX {
 
   public abstract void quickApplyConfig(TalonFXConfiguration config);
 
+  public abstract void quickApplyConfig(SlotConfigs config);
+
+  public abstract void quickApplyConfig(MotionMagicConfigs config);
+
   public Voltage getPrimaryAppliedVoltage() {
     return getAppliedVoltage(0);
   }
@@ -274,10 +280,10 @@ public abstract class LoggedTalonFX {
   }
 
   public double getPrimaryTemperatureC() {
-    return getTempuratureC(0);
+    return getTemperatureC(0);
   }
 
-  public double getTempuratureC(int follower) {
+  public double getTemperatureC(int follower) {
     return this.inputs.temperatureC[follower];
   }
 

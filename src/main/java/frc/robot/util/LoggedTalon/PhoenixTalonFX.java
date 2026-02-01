@@ -3,6 +3,8 @@ package frc.robot.util.LoggedTalon;
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.StatusSignal;
+import com.ctre.phoenix6.configs.MotionMagicConfigs;
+import com.ctre.phoenix6.configs.SlotConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.ControlRequest;
 import com.ctre.phoenix6.controls.Follower;
@@ -25,7 +27,7 @@ public class PhoenixTalonFX extends LoggedTalonFX {
   private final StatusSignal<AngularVelocity> velocitySignal;
   private final StatusSignal<Angle> positionSignal;
 
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({"unchecked", "resource"})
   public PhoenixTalonFX(int canID, CANBus canBus, String name, PhoenixTalonFollower... followers) {
 
     super(name, followers.length);
@@ -106,6 +108,16 @@ public class PhoenixTalonFX extends LoggedTalonFX {
 
   @Override
   public void quickApplyConfig(TalonFXConfiguration config) {
+    PhoenixUtil.tryUntilOk(3, () -> talonFX[0].getConfigurator().apply(config));
+  }
+
+  @Override
+  public void quickApplyConfig(SlotConfigs config) {
+    PhoenixUtil.tryUntilOk(3, () -> talonFX[0].getConfigurator().apply(config));
+  }
+
+  @Override
+  public void quickApplyConfig(MotionMagicConfigs config) {
     PhoenixUtil.tryUntilOk(3, () -> talonFX[0].getConfigurator().apply(config));
   }
 
