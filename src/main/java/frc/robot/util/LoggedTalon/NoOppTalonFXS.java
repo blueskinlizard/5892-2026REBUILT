@@ -25,7 +25,8 @@ public class NoOppTalonFXS extends LoggedTalonFXS {
   }
 
   @Override
-  public LoggedTalonFXS withSimConfig(Function<TalonFXSConfiguration, TalonFXSConfiguration> config) {
+  public LoggedTalonFXS withSimConfig(
+      Function<TalonFXSConfiguration, TalonFXSConfiguration> config) {
     return this;
   }
 
