@@ -17,13 +17,17 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.MutAngle;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
+import frc.robot.Constants.Mode;
 import frc.robot.RobotState;
 import frc.robot.util.LoggedDIO.LoggedDIO;
 import frc.robot.util.LoggedTalon.LoggedTalonFX;
@@ -33,7 +37,6 @@ import frc.robot.util.MechanismUtil;
 import java.util.function.Supplier;
 import lombok.Getter;
 import lombok.Setter;
-import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 public class Turret extends SubsystemBase {
@@ -62,7 +65,6 @@ public class Turret extends SubsystemBase {
   private final MotionMagicTorqueCurrentFOC mmControl = new MotionMagicTorqueCurrentFOC(0);
   private final NeutralOut neutralControl = new NeutralOut();
 
-  @AutoLogOutput(key = "Turret/TargetPosition")
   private final MutAngle targetPosition = Degree.mutable(0);
 
   private boolean positionControl = false;
@@ -89,6 +91,9 @@ public class Turret extends SubsystemBase {
             .withFeedback(new FeedbackConfigs().withSensorToMechanismRatio(15));
     motor.withConfig(config).withMMPIDTuning(config);
     setDefaultCommand(aimCommand());
+    if (Constants.currentMode == Mode.SIM) {
+      SmartDashboard.putData("Turret/SetHomed", setHomed());
+    }
   }
 
   public Command aimCommand() {
@@ -134,9 +139,10 @@ public class Turret extends SubsystemBase {
   }
 
   public void requestPosition(Angle position) {
+
     targetPosition.mut_setBaseUnitMagnitude(
         MathUtil.inputModulus(
-            position.baseUnitMagnitude(),
+            position.baseUnitMagnitude() + Math.PI,
             minAngle.get().baseUnitMagnitude(),
             maxAngle.get().baseUnitMagnitude()));
     positionControl = true;
@@ -161,6 +167,10 @@ public class Turret extends SubsystemBase {
         this);
   }
 
+  public Command setHomed() {
+    return runOnce(() -> this.setHomed(true)).ignoringDisable(true);
+  }
+
   @Override
   public final void periodic() {
     motor.periodic();
@@ -177,7 +187,10 @@ public class Turret extends SubsystemBase {
     Logger.recordOutput(
         "Turret/VisibleSetpoint",
         new Pose3d(RobotState.getInstance().getRobotPosition())
-            .rotateBy(new Rotation3d(Rotations.zero(), Rotations.zero(), targetPosition)));
+            .transformBy(
+                new Transform3d(
+                    turretVisual,
+                    new Rotation3d(Rotations.zero(), Rotations.zero(), targetPosition))));
   }
 
   private void setControl() {
@@ -192,3 +205,7 @@ public class Turret extends SubsystemBase {
     }
   }
 }
+/*
+Chassis
+Handoff
+ */
