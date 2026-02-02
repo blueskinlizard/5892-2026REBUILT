@@ -5,9 +5,8 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 import frc.robot.util.LoggedTalon.Follower.PhoenixTalonFollower;
-import frc.robot.util.LoggedTalon.TalonFXS.BaseTalonFXSSim;
-import frc.robot.util.LoggedTalon.TalonFXS.LoggedTalonFXS;
 import frc.robot.util.LoggedTalon.TalonInputs;
+
 // Maintainer notes:
 // The file is currently a copy of LoggedTalonFX, with all instances of TalonFX replaced with
 // TalonFXS. Thanks CTRE, much appreciated

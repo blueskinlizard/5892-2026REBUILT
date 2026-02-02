@@ -8,8 +8,8 @@ import frc.robot.util.LoggedDIO.SimDIO;
 import frc.robot.util.LoggedTalon.Follower.PhoenixTalonFollower;
 import frc.robot.util.LoggedTalon.TalonFX.NoOppTalonFX;
 import frc.robot.util.LoggedTalon.TalonFX.PhoenixTalonFX;
-import frc.robot.util.LoggedTalon.TalonFX.TalonFXSimpleMotorSim;
 import frc.robot.util.LoggedTalon.TalonFX.TalonFXFlywheelSim;
+import frc.robot.util.LoggedTalon.TalonFX.TalonFXSimpleMotorSim;
 import lombok.Getter;
 
 /** Container for shooting bits. This class will initialize the propper IO interfaces. */

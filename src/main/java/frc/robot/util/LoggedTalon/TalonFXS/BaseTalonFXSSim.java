@@ -5,8 +5,6 @@ import com.ctre.phoenix6.configs.TalonFXSConfiguration;
 import com.ctre.phoenix6.sim.TalonFXSSimState;
 import edu.wpi.first.wpilibj.RobotController;
 import frc.robot.util.LoggedTalon.Follower.PhoenixTalonFollower;
-import frc.robot.util.LoggedTalon.TalonFXS.LoggedTalonFXS;
-import frc.robot.util.LoggedTalon.TalonFXS.PhoenixTalonFXS;
 import frc.robot.util.LoggedTalon.TalonInputs;
 import java.util.function.Function;
 

@@ -10,10 +10,10 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.Alert;
 import frc.robot.util.LoggedTalon.Follower.PhoenixTalonFollower;
 import frc.robot.util.LoggedTalon.LoggedTalon;
-import frc.robot.util.LoggedTalon.TalonFX.TalonFXSimpleMotorSim;
 import frc.robot.util.LoggedTalon.TalonFX.LoggedTalonFX;
 import frc.robot.util.LoggedTalon.TalonFX.PhoenixTalonFX;
 import frc.robot.util.LoggedTalon.TalonFX.TalonFXFlywheelSim;
+import frc.robot.util.LoggedTalon.TalonFX.TalonFXSimpleMotorSim;
 import java.util.function.Function;
 
 /**

@@ -9,8 +9,8 @@ import frc.robot.util.LoggedDIO.NoOppDio;
 import frc.robot.util.LoggedDIO.SimDIO;
 import frc.robot.util.LoggedTalon.TalonFX.NoOppTalonFX;
 import frc.robot.util.LoggedTalon.TalonFX.PhoenixTalonFX;
-import frc.robot.util.LoggedTalon.TalonFX.TalonFXSimpleMotorSim;
 import frc.robot.util.LoggedTalon.TalonFX.TalonFXFlywheelSim;
+import frc.robot.util.LoggedTalon.TalonFX.TalonFXSimpleMotorSim;
 import frc.robot.util.RollerSubsystem.Direction;
 import lombok.Getter;
 
