@@ -41,8 +41,8 @@ public class TalonFXSFlywheelSim extends BaseTalonFXSSim {
     motorSim =
         new FlywheelSim(
             LinearSystemId.createFlywheelSystem(
-                DCMotor.getKrakenX60Foc(followers.length + 1), J_KgMetersSquared, gearReduction),
-            DCMotor.getKrakenX60Foc(followers.length + 1));
+                DCMotor.getMinion(followers.length + 1), J_KgMetersSquared, gearReduction),
+            DCMotor.getMinion(followers.length + 1));
   }
 
   @Override
