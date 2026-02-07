@@ -147,10 +147,4 @@ public class LoggedTunableNumber implements DoubleSupplier {
   public double getAsDouble() {
     return get();
   }
-
-  public static void ifChanged(
-      int hashCode, LoggedTunableNumber stowTrenchGapOffset, Object tunableNumbers) {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'ifChanged'");
-  }
 }
