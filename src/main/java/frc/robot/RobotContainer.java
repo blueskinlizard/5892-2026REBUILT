@@ -34,6 +34,8 @@ import frc.robot.subsystems.drive.ModuleIOTalonFX;
 import frc.robot.subsystems.indexer.*;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.shooter.Shooter;
+import frc.robot.subsystems.shooter.ShotCalculator;
+import frc.robot.subsystems.shooter.ShotCalculator.Goal;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOLimelight;
@@ -176,6 +178,10 @@ public class RobotContainer {
                     drive)
                 .ignoringDisable(true));
     controller.a().onTrue(ShootCommands.shoot(indexer, shooter));
+
+    controller.x().onTrue(ShotCalculator.getInstance().setGoalCommand(Goal.LEFT));
+    controller.b().onTrue(ShotCalculator.getInstance().setGoalCommand(Goal.RIGHT));
+    controller.y().onTrue(ShotCalculator.getInstance().setGoalCommand(Goal.HUB));
   }
 
   /**
