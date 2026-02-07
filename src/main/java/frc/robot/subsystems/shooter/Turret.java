@@ -95,6 +95,8 @@ public class Turret extends SubsystemBase {
     if (Constants.currentMode == Mode.SIM) {
       SmartDashboard.putData("Turret/SetHomed", setHomed());
     }
+    // Preload so AdvantageKit can process logging stuff before the match starts.
+    ShotCalculator.getInstance().calculateShot();
   }
 
   public Command aimCommand() {
