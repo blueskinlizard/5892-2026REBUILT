@@ -2,6 +2,7 @@ package frc.robot.util.LoggedTalon.TalonFXS;
 
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.SlotConfigs;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.configs.TalonFXSConfiguration;
 import com.ctre.phoenix6.hardware.TalonFXS;
 import com.ctre.phoenix6.signals.InvertedValue;
@@ -103,7 +104,7 @@ import java.util.function.Function;
 // Maintainer notes:
 // The file is currently a copy of LoggedTalonFX, with all instances of TalonFX replaced with
 // TalonFXS. Thanks CTRE, much appreciated
-public abstract class LoggedTalonFXS extends LoggedTalon {
+public abstract class LoggedTalonFXS extends LoggedTalon<LoggedTalonFXS> {
 
   /**
    * @see LoggedTalon#LoggedTalon
@@ -183,6 +184,25 @@ public abstract class LoggedTalonFXS extends LoggedTalon {
         supplyCurrentLimit,
         InvertedValue.CounterClockwise_Positive,
         NeutralModeValue.Coast);
+  }
+
+  /**
+   * Enable PID and Motion Magic position tuning to this motor. NOOP if {@code Constants.tuningMode
+   * != true}
+   *
+   * @param config the current and default config. This config is assumed to be applied. Slot 0 is
+   *     used.
+   * @param followers other LoggedTalons that should also get this config. This is useful if
+   *     multiple motors share tuning values but are controlled independently (like in a swerve
+   *     drivetrain)
+   * @return {@code this} for method chaining
+   */
+  public LoggedTalonFXS withMMPIDTuning(TalonFXConfiguration config, LoggedTalon<?>... followers) {
+    return withMMPIDTuning(SlotConfigs.from(config.Slot0), config.MotionMagic);
+  }
+
+  protected LoggedTalonFXS self() {
+    return this;
   }
 
   /**

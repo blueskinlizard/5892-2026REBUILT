@@ -97,7 +97,7 @@ import java.util.function.Function;
  * @see LoggedTalon
  * @see LoggedTalonFXS
  */
-public abstract class LoggedTalonFX extends LoggedTalon {
+public abstract class LoggedTalonFX extends LoggedTalon<LoggedTalonFX> {
 
   /**
    * @see LoggedTalon#LoggedTalon
@@ -177,6 +177,25 @@ public abstract class LoggedTalonFX extends LoggedTalon {
         supplyCurrentLimit,
         InvertedValue.CounterClockwise_Positive,
         NeutralModeValue.Coast);
+  }
+
+  /**
+   * Enable PID and Motion Magic position tuning to this motor. NOOP if {@code Constants.tuningMode
+   * != true}
+   *
+   * @param config the current and default config. This config is assumed to be applied. Slot 0 is
+   *     used.
+   * @param followers other LoggedTalons that should also get this config. This is useful if
+   *     multiple motors share tuning values but are controlled independently (like in a swerve
+   *     drivetrain)
+   * @return {@code this} for method chaining
+   */
+  public LoggedTalonFX withMMPIDTuning(TalonFXConfiguration config, LoggedTalon<?>... followers) {
+    return withMMPIDTuning(SlotConfigs.from(config.Slot0), config.MotionMagic, followers);
+  }
+
+  protected LoggedTalonFX self() {
+    return this;
   }
 
   /**

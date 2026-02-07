@@ -4,6 +4,7 @@ import static edu.wpi.first.units.Units.*;
 
 import com.ctre.phoenix6.configs.FeedbackConfigs;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
+import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.SlotConfigs;
 import com.ctre.phoenix6.controls.ControlRequest;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -113,7 +114,7 @@ import org.littletonrobotics.junction.inputs.LoggableInputs;
  * @see TalonFXSimpleMotorSim
  * @see TalonFXFlywheelSim
  */
-public abstract class LoggedTalon {
+public abstract class LoggedTalon<T extends LoggedTalon<T>> {
   protected final String name;
   private final TalonInputsAutoLogged inputs = new TalonInputsAutoLogged();
   private final Alert[] connectionAlerts;
@@ -123,7 +124,7 @@ public abstract class LoggedTalon {
   private LoggedTunableNumber[] tunableNumbers = null;
   private SlotConfigs tunedConfigs = null;
   private MotionMagicConfigs mmTunedConfigs = null;
-  private LoggedTalon[] tuningFollowers = null;
+  private LoggedTalon<?>[] tuningFollowers = null;
   protected final int followers;
 
   private final MutAngularVelocity velocity = RadiansPerSecond.mutable(0);
@@ -198,7 +199,7 @@ public abstract class LoggedTalon {
    */
   private void applyAllTuningChanges(double[] values) {
     applyTuningChange(values);
-    for (LoggedTalon tuningFollower : tuningFollowers) {
+    for (LoggedTalon<?> tuningFollower : tuningFollowers) {
       tuningFollower.applyTuningChange(values);
     }
   }
@@ -237,8 +238,8 @@ public abstract class LoggedTalon {
    *     drivetrain)
    * @return {@code this} for method chaining
    */
-  public LoggedTalon withPIDTunable(SlotConfigs defaultValues, LoggedTalon... followers) {
-    if (!Constants.tuningMode) return this;
+  public T withPIDTunable(SlotConfigs defaultValues, LoggedTalon<?>... followers) {
+    if (!Constants.tuningMode) return self();
     if (pidTuning) {
       DriverStation.reportWarning("Attempted to initiate PID tuning twice", true);
     }
@@ -258,7 +259,20 @@ public abstract class LoggedTalon {
     tunedConfigs = defaultValues;
     tuningFollowers = followers;
 
-    return this;
+    return self();
+  }
+
+  /**
+   * Enable PID tuning to this motor. NOOP if {@code Constants.tuningMode != true}
+   *
+   * @param config the current and default config. This config is assumed to be applied.
+   * @param followers other LoggedTalons that should also get this config. This is useful if
+   *     multiple motors share tuning values but are controlled independently (like in a swerve
+   *     drivetrain)
+   * @return {@code this} for method chaining
+   */
+  public T withPIDTunable(Slot0Configs config, LoggedTalon<?>... followers) {
+    return withPIDTunable(SlotConfigs.from(config), followers);
   }
 
   /**
@@ -272,10 +286,10 @@ public abstract class LoggedTalon {
    *     drivetrain)
    * @return {@code this} for method chaining
    */
-  public LoggedTalon withMMPIDTuning(
-      SlotConfigs slotConfig, MotionMagicConfigs mmConfig, LoggedTalon... followers) {
+  public T withMMPIDTuning(
+      SlotConfigs slotConfig, MotionMagicConfigs mmConfig, LoggedTalon<?>... followers) {
     withPIDTunable(slotConfig, followers);
-    if (!Constants.tuningMode) return this;
+    if (!Constants.tuningMode) return self();
     this.mmTunedConfigs = mmConfig;
     if (mmTuning) {
       DriverStation.reportWarning("Attempted to initiate Motion Magic tuning twice", true);
@@ -294,7 +308,7 @@ public abstract class LoggedTalon {
     System.arraycopy(
         mmTunableNumbers, 0, copy, this.tunableNumbers.length, mmTunableNumbers.length);
     this.tunableNumbers = copy;
-    return this;
+    return self();
   }
 
   /**
@@ -470,4 +484,6 @@ public abstract class LoggedTalon {
    * @param position value to set to
    */
   public abstract void setPosition(Angle position);
+
+  protected abstract T self();
 }
